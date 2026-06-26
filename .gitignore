@@ -186,3 +186,7 @@ memory.db
 # Ignore Accounts database in capstone project
 6_mcp/accounts.db
 6_mcp/memory/*.db
+
+# Personal LinkedIn artifacts — created for my own posts, not for the public repo
+1_foundations/week1_agentic_ai.png
+1_foundations/week1_signal_cartography.md

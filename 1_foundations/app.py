@@ -76,9 +76,12 @@ tools = [{"type": "function", "function": record_user_details_json},
 class Me:
 
     def __init__(self):
-        self.openai = OpenAI()
-        self.name = "Ed Donner"
-        reader = PdfReader("me/linkedin.pdf")
+        self.openai = OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=os.getenv("GROQ_API_KEY"),
+        )
+        self.name = "Izma Anwar"
+        reader = PdfReader("me/IzmaAnwarResume.pdf")
         self.linkedin = ""
         for page in reader.pages:
             text = page.extract_text()
@@ -113,10 +116,13 @@ If the user is engaging in discussion, try to steer them towards getting in touc
         return system_prompt
     
     def chat(self, message, history):
+        # Gradio adds extra fields to history; Groq (unlike OpenAI) rejects them on the
+        # second turn, so normalize history to just role/content first.
+        history = [{"role": h["role"], "content": h["content"]} for h in history]
         messages = [{"role": "system", "content": self.system_prompt()}] + history + [{"role": "user", "content": message}]
         done = False
         while not done:
-            response = self.openai.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+            response = self.openai.chat.completions.create(model="llama-3.3-70b-versatile", messages=messages, tools=tools)
             if response.choices[0].finish_reason=="tool_calls":
                 message = response.choices[0].message
                 tool_calls = message.tool_calls
